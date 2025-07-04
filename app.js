@@ -59,11 +59,26 @@ app.get('/listings', (req, res) => {
     });
 });
 
+// we have to write it on above of :id route beause if it below it
+// it will not work as it will match the :id route first
+app.get('/listings/new', (req, res) => {
+    res.render('new.ejs');
+})
+
 // Route to fetch a specific listing by ID and render the show page
 // This route will fetch a specific listing from the database using its ID and render the show.ejs template with the listing data.
 app.get('/listings/:id',async (req, res) => {
     let {id} = req.params;
     const listing = await Listing.findById(id)
     res.render('show.ejs', {listing});
-    console.log(`details fetched of ${listing.title}`);
+    console.log(`details fetched of (${listing.title})`);
+});
+
+app.post('/listings', async (req, res) => {
+    // const { title, description, price, location, country } = req.body;
+    const listingData = req.body.listing;
+    const newListing = new Listing(listingData);
+    await newListing.save();
+    console.log('New listing created:', newListing);
+    res.redirect('/listings');
 });
