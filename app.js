@@ -4,6 +4,9 @@ const mongoose = require('mongoose');
 const Listing = require('./models/listing.js');
 const path = require('path');
 
+const methodOverride = require('method-override');
+app.use(methodOverride('_method'));
+
 main()
   .then(() => console.log('MongoDB connected successfully'))
   .catch(err => console.log('MongoDB connection error:', err));
@@ -63,6 +66,7 @@ app.get('/listings', (req, res) => {
 // it will not work as it will match the :id route first
 app.get('/listings/new', (req, res) => {
     res.render('new.ejs');
+    console.log('Creating new Listing');
 })
 
 // Route to fetch a specific listing by ID and render the show page
@@ -71,7 +75,7 @@ app.get('/listings/:id',async (req, res) => {
     let {id} = req.params;
     const listing = await Listing.findById(id)
     res.render('show.ejs', {listing});
-    console.log(`details fetched of (${listing.title})`);
+    console.log(`details fetched for (${listing.title})`);
 });
 
 app.post('/listings', async (req, res) => {
@@ -80,5 +84,26 @@ app.post('/listings', async (req, res) => {
     const newListing = new Listing(listingData);
     await newListing.save();
     console.log('New listing created:', newListing);
+    res.redirect('/listings');
+});
+
+app.get('/listings/:id/edit', async (req, res) => {
+    let {id} = req.params;
+    const listing = await Listing.findById(id);
+    res.render('edit.ejs', {listing});
+    console.log(`Editing the list (${listing.title})`);
+});
+
+app.put('/listings/:id', async (req, res) => {
+    let {id} = req.params;
+    const updatedListing = await Listing.findByIdAndUpdate(id, req.body.listing, { new: true });
+    console.log(`Listing updated: ${updatedListing}`);
+    res.redirect(`/listings/${id}`);
+});
+
+app.delete('/listings/:id', async (req, res) => {
+    let {id} = req.params;
+    let deletedList = await Listing.findByIdAndDelete(id);
+    console.log(`Listing ${deletedList} deleted successfully`);
     res.redirect('/listings');
 });

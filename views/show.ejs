@@ -15,6 +15,15 @@
         <li>location: <%= listing.location %></li>
         <li>country: <%= listing.country %></li>
         <!-- <li>Image: <img src="<%= listing.image  %>" alt="<%= listing.image %>"></li> -->
-    </ul>
+    </ul> 
+    <br>
+    <a href="/listings/<%= listing._id %>/edit">Edit This Listing</a>
+    <br>
+    <a href="/listings">Back to Listings</a>
+    <br>
+    <form method="post" action="/listings/<%= listing._id%>?_method=Delete">
+        <button type="submit">Delete</button>
+    </form>
+    <br>
 </body>
 </html>
